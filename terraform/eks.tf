@@ -28,9 +28,9 @@ resource "aws_eks_node_group" "main" {
   ]
 
   scaling_config {
-    desired_size = 2
-    min_size     = 2
-    max_size     = 3
+    desired_size = 5
+    min_size     = 3
+    max_size     = 7
   }
 
   instance_types = [
