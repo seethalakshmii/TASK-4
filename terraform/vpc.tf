@@ -1,5 +1,6 @@
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
+  enable_dns_support   = true
   enable_dns_hostnames = true
 
   tags = {
@@ -9,13 +10,24 @@ resource "aws_vpc" "main" {
 
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "gitops-igw"
+  }
 }
 
+# PUBLIC SUBNETS
 resource "aws_subnet" "public_1" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.0.1.0/24"
   availability_zone       = "ap-south-1a"
   map_public_ip_on_launch = true
+
+  tags = {
+    Name = "public-1"
+    "kubernetes.io/cluster/gitops-eks" = "shared"
+    "kubernetes.io/role/elb"           = "1"
+  }
 }
 
 resource "aws_subnet" "public_2" {
@@ -23,20 +35,40 @@ resource "aws_subnet" "public_2" {
   cidr_block              = "10.0.2.0/24"
   availability_zone       = "ap-south-1b"
   map_public_ip_on_launch = true
+
+  tags = {
+    Name = "public-2"
+    "kubernetes.io/cluster/gitops-eks" = "shared"
+    "kubernetes.io/role/elb"           = "1"
+  }
 }
 
+# PRIVATE SUBNETS
 resource "aws_subnet" "private_1" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = "10.0.3.0/24"
   availability_zone = "ap-south-1a"
+
+  tags = {
+    Name = "private-1"
+    "kubernetes.io/cluster/gitops-eks" = "shared"
+    "kubernetes.io/role/internal-elb"   = "1"
+  }
 }
 
 resource "aws_subnet" "private_2" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = "10.0.4.0/24"
   availability_zone = "ap-south-1b"
+
+  tags = {
+    Name = "private-2"
+    "kubernetes.io/cluster/gitops-eks" = "shared"
+    "kubernetes.io/role/internal-elb"   = "1"
+  }
 }
 
+# NAT
 resource "aws_eip" "nat" {
   domain = "vpc"
 }
@@ -46,6 +78,7 @@ resource "aws_nat_gateway" "nat" {
   subnet_id     = aws_subnet.public_1.id
 }
 
+# PUBLIC ROUTE TABLE
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 }
@@ -66,6 +99,7 @@ resource "aws_route_table_association" "public_2" {
   route_table_id = aws_route_table.public.id
 }
 
+# PRIVATE ROUTE TABLE
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.main.id
 }
