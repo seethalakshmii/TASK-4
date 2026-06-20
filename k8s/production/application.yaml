@@ -10,7 +10,7 @@ spec:
 
   source:
     repoURL: https://github.com/seethalakshmii/TASK-4.git
-    targetRevision: HEAD
+    targetRevision: main   # IMPORTANT: use stable branch for prod
     path: k8s/production
 
   destination:
@@ -21,3 +21,6 @@ spec:
     automated:
       prune: true
       selfHeal: true
+
+    syncOptions:
+      - CreateNamespace=true

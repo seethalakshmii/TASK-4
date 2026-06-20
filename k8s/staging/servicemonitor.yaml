@@ -1,20 +1,18 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
-
 metadata:
   name: flask-app-staging
   namespace: monitoring
-
 spec:
   selector:
     matchLabels:
-      app: flask-app
+      app.kubernetes.io/name: flask-app
 
   namespaceSelector:
     matchNames:
-    - staging
+      - staging
 
   endpoints:
-  - port: http
-    path: /metrics
-    interval: 15s
+    - port: http
+      path: /metrics
+      interval: 15s

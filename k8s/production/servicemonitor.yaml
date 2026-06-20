@@ -1,20 +1,18 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
-
 metadata:
   name: flask-app-production
   namespace: monitoring
-
 spec:
   selector:
     matchLabels:
-      app: flask-app
+      app: flask-app   # MUST match service labels exactly
 
   namespaceSelector:
     matchNames:
-    - production
+      - production
 
   endpoints:
-  - port: http
-    path: /metrics
-    interval: 15s
+    - port: http      # MUST match service port NAME
+      path: /metrics
+      interval: 15s
